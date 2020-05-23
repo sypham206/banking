@@ -1,4 +1,4 @@
-﻿//Snipping tool
+//Snipping tool
 const express = require("express")
 const cors = require('cors');
 const moment = require("moment");
@@ -44,7 +44,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get('/', (req, res) => {              
-    res.json('Welcome to TTS Banking');
+    res.json('Welcome to TTS Banking RSA!');
 });
 
 // Routes 
