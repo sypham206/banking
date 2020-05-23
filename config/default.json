@@ -1,11 +1,11 @@
 {
     "mysql": {
       "connectionLimit": 100,
-      "host": "localhost",
+      "host": "sql12.freemysqlhosting.net",
       "port": 3306,
-      "user": "root",
-      "password": "",
-      "database": "internet_banking"
+      "user": "sql12342852",
+      "password": "fvFt8fu8RE",
+      "database": "sql12342852"
     },
     "auth": {
       "secret": "secretKey",
