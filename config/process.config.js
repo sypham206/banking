@@ -9,8 +9,8 @@ module.exports = {
         RSA_PRIVATEKEY : "?"
     },
     partnerPGP :{
-        PGP_PUBLICKEY : "",
-        PGP_PRIVATEKEY : ""
+        RSA_PUBLICKEY : "",
+        RSA_PRIVATEKEY : ""
     },
     partnerForTestRSA  :{
         RSA_PUBLICKEY : "-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCyceITLtFoy4KzMgmr6NEnvk1VBH7pRuyyg7IkXc3kBspKs9CIErm2eJtEtduIPQK+3AgiQW+fjL1dDMQr7ENZiGzWhEPoSbU348mjg1fxFDztFB4QiqAd7UUvj1kK2/UT+D0C6Sgc0O69C9lRGahPSAX+7ZArGIodtfuOKPenEwIDAQAB-----END PUBLIC KEY-----",

@@ -145,21 +145,20 @@ router.get("/partner", async (req, res) => {
 router.post("/partner/recharge", async function (req, res) {
   const partnerCode = req.get("partnerCode");
   const signature = req.get("signature"); // sig hay sign ?  
-  let keyPublic;
-  var veri = false;
+  
   // Kiểm tra ngân hàng liên kết là RSA/ PGP hay ForTest để lấy keyPulic
+  let partner;
   if (partnerCode == config.auth.partnerRSA) {
-    keyPublic = new NodeRSA(process.partnerRSA.RSA_PUBLICKEY);
-    veri = keyPublic.verify(req.body, signature, "base64", "base64");
+    partner = process.partnerRSA;
   }
   if (partnerCode == config.auth.partnerPGP) {
-    // 1. get keyPublic from partnerPGP
-    // 2. check veri is true or false by PGP method
+    partner = process.partnerPGP;
   }
   if (partnerCode == config.auth.partnerForTestRSA) {
-    keyPublic = new NodeRSA(process.partnerForTestRSA.RSA_PUBLICKEY);
-    veri = keyPublic.verify(JSON.stringify(req.body), signature, "base64", "base64");
+    partner = process.partnerForTestRSA;
   }
+  const keyPublic = new NodeRSA(partner.RSA_PUBLICKEY);
+  const veri = keyPublic.verify(JSON.stringify(req.body), signature, "base64", "base64");
   // const data = req.body.account_num + ', ' + req.body.money + ', ' + req.body.currentTime;
   
   // (xem lai source encoding: (base64/utf8))
