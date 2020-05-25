@@ -17,18 +17,28 @@ const confirm = (req) => {
   const ts = +req.get("ts"); // const ts = +req.headers['ts'];
   const partnerCode = req.get("partnerCode");
   const sig = req.get("sig");
-  const hashSecretKey = md5(config.auth.secretPartner);
-  const comparingSign = md5(ts + req.body + hashSecretKey);
-
+  let hashSecretKey; // = md5(config.auth.secretPartner);
   const currentTime = moment().valueOf();
+
   if (currentTime - ts > config.auth.expireTime) {
     return 1;
   }
 
-  if (partnerCode != "TEST" && partnerCode != "GO") {
+  if (partnerCode != config.auth.partnerRSA && partnerCode != config.auth.partnerPGP && partnerCode != config.auth.partnerForTestRSA) {
     //điền Code của bank - partner
     return 2;
   }
+
+  if (partnerCode == config.auth.partnerRSA) {
+    hashSecretKey = md5(config.auth.secretPartnerRSA);
+  }
+  if (partnerCode == config.auth.partnerPGP) {
+    hashSecretKey = md5(config.auth.secretPartnerPGP);
+  }
+  if (partnerCode == config.auth.partnerForTestRSA) {
+    hashSecretKey = md5(config.auth.secretPartnerForTestRSA);
+  }
+  const comparingSign = md5(ts + JSON.stringify(req.body) + hashSecretKey);
 
   if (sig != comparingSign) {
     return 3;
@@ -133,11 +143,25 @@ router.get("/partner", async (req, res) => {
 
 // nộp tiền vào tài khoản
 router.post("/partner/recharge", async function (req, res) {
-  const signature = req.get("signature"); // sig hay sign ?
-  const keyPublic = new NodeRSA(process.partner.RSA_PUBLICKEY);
-  
+  const partnerCode = req.get("partnerCode");
+  const signature = req.get("signature"); // sig hay sign ?  
+  let keyPublic;
+  var veri = false;
+  // Kiểm tra ngân hàng liên kết là RSA/ PGP hay ForTest để lấy keyPulic
+  if (partnerCode == config.auth.partnerRSA) {
+    keyPublic = new NodeRSA(process.partnerRSA.RSA_PUBLICKEY);
+    veri = keyPublic.verify(req.body, signature, "base64", "base64");
+  }
+  if (partnerCode == config.auth.partnerPGP) {
+    // 1. get keyPublic from partnerPGP
+    // 2. check veri is true or false by PGP method
+  }
+  if (partnerCode == config.auth.partnerForTestRSA) {
+    keyPublic = new NodeRSA(process.partnerForTestRSA.RSA_PUBLICKEY);
+    veri = keyPublic.verify(JSON.stringify(req.body), signature, "base64", "base64");
+  }
   // const data = req.body.account_num + ', ' + req.body.money + ', ' + req.body.currentTime;
-  var veri = keyPublic.verify(req.body, signature, "base64", "base64");
+  
   // (xem lai source encoding: (base64/utf8))
   // source encoding cua ham veri() phu thuoc vao ham sign()
   var con = confirm(req);
@@ -197,7 +221,7 @@ router.post("/partner/recharge", async function (req, res) {
       currentTime: moment().valueOf(),
     };
     const pCode = req.get("partnerCode");
-    if (pCode == "TEST") { // partCode của nhóm rsa
+    if (pCode == config.auth.partnerRSA || pCode == config.auth.partnerForTestRSA) { // partner RSA
         const keyPrivate = new NodeRSA(process.ourkey.RSA_PRIVATEKEY);
         const keysigned = keyPrivate.sign(responseForClient, "base64", "base64");
 
@@ -205,8 +229,7 @@ router.post("/partner/recharge", async function (req, res) {
           status: "success",
           responseSignature: keysigned,
         });
-    }else{  //partCode của nhóm GPG
-
+    } else {  // partner PGP
         const mySig = await signPGP(responseForClient);
         res.status(203).json({
           status: "success",
