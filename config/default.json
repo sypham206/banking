@@ -8,6 +8,7 @@
       "database": "sql12342852"
     },
     "auth": {
+      "bankcode": "GO",
       "secret": "secretKey",
       "partnerRSA": "25Bank",
       "secretPartnerRSA" : "Infymt",

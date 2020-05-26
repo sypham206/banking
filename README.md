@@ -1,1 +1,1 @@
-# RSA Banking @26052020
+# RSA Banking Tuesday, 26/05/2020
